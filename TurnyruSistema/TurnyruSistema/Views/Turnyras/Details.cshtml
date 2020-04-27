@@ -1,0 +1,48 @@
+﻿@model TurnyruSistema.Models.Turnyras
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Turnyras</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Pavadinimas)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Pavadinimas)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Vieta)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Vieta)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PradziosData)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PradziosData)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PabaigosData)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PabaigosData)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Organizatorius)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Organizatorius.Id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
