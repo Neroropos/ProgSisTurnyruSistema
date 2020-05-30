@@ -242,5 +242,51 @@ namespace TurnyruSistema.Controllers
             return await _context.KomandaTurnyras
                 .Where(m => m.TurnyrasId == id).ToListAsync();
         }
+
+        public async Task<IActionResult> TournamentTeams(int id)
+        {
+            return View(await _context.KomandaTurnyras
+                .Where(m => m.TurnyrasId == id).ToListAsync());
+        }
+
+        public async Task<IActionResult> ConfirmTeam(int? id)
+        {
+            var patvirtinimas = await _context.KomandaTurnyras
+                //.Include(t => t.Organizatorius)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            patvirtinimas.Dalyvauja = true;
+
+            if (ModelState.IsValid)
+            {
+                _context.Update(patvirtinimas);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index)); ;
+
+        }
+
+        public async Task<IActionResult> Register(int? id, [Bind("Dalyvauja,Ispejimai,KomandaId,TurnyrasId")] KomandaTurnyras registracija)
+        {
+            var turnyras = await _context.Turnyras
+                //.Include(t => t.Organizatorius)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            registracija.Dalyvauja = false;
+            registracija.Ispejimai = 0;
+            registracija.KomandaId = (int)TempData["curUserId"];
+            TempData.Keep();
+            registracija.TurnyrasId = (int)id;
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(registracija);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index)); ;
+
+        }
     }
 }
