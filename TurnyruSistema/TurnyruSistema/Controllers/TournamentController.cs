@@ -288,5 +288,11 @@ namespace TurnyruSistema.Controllers
             return RedirectToAction(nameof(Index)); ;
 
         }
+
+        public async Task<IActionResult> EditTournament(int? id)
+        {
+            //computerZoneController = new ComputerZoneController(_context);
+            return RedirectToAction("Details", "ComputerZone", new { id });
+        }
     }
 }

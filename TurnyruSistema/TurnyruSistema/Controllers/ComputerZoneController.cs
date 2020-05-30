@@ -73,24 +73,12 @@ namespace TurnyruSistema.Controllers
             return View(kompiuteriuZona);
         }
 
-        public async Task<IActionResult> AddComputerZone(int id)
+        public IActionResult AddComputerZone(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-
-            var kompiuteriuZona = await _context.KompiuteriuZona
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (kompiuteriuZona == null)
-            {
-                return NotFound();
-            }
-
-            //Console.Write(zaidejas);
+            var kompiuteriuZona = new KompiuteriuZona { TurnyrasId = id };
             return View(kompiuteriuZona);
-            
+
 
         }
 

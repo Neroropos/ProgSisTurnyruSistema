@@ -1,0 +1,82 @@
+﻿@model TurnyruSistema.Models.Turnyras
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Kompiuterių zonų sąrašas</h2>
+
+<p>
+    <a asp-action="AddComputerZone" asp-route-id="@Model.Id">Pridėti kompiuterių zoną</a>
+</p>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.KompiuteriuZonos[0].Pavadinimas)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.KompiuteriuZonos[0].KompiuteriuSkaicius)
+            </th>
+
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.KompiuteriuZonos)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pavadinimas)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KompiuteriuSkaicius)
+                </td>
+
+
+
+
+
+                <td>
+
+                    <a asp-action="Edit" asp-route-id="@item.Id">Redaguoti kompiuterių zoną</a> 
+                    
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@*<div>
+    <h4>KompiuteriuZona</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Pavadinimas)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Pavadinimas)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.KompiuteriuSkaicius)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.KompiuteriuSkaicius)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Turnyras)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Turnyras.Id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>*@
