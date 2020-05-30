@@ -1,0 +1,57 @@
+﻿@model IEnumerable<TurnyruSistema.Models.KomandaTurnyras>
+
+@{
+    ViewData["Title"] = "TournamentTeams";
+}
+
+<h2>Prašymai dalyvauti turnyre</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Dalyvauja)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ispejimai)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Komanda)
+            </th>
+
+
+            <th>
+                @Html.DisplayNameFor(model => model.KomandaId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dalyvauja)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ispejimai)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Komanda)
+                </td>
+
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.KomandaId)
+                </td>
+                <td>
+                    <a asp-action="ConfirmTeam" asp-route-id="@item.Id">PatvirtintiKomandą</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
