@@ -13,18 +13,26 @@ namespace TurnyruSistema.Controllers
         private readonly TurnyruSistemaContext _context;
         public IActionResult Index()
         {
-            if (TempData["curUser"] == null)
-                TempData["curUser"] = _context.Organizatorius.FirstOrDefault().Id;
+            if (TempData["curUserId"] == null)
+            {
+                TempData["curUserId"] = _context.Organizatorius.FirstOrDefault().Id;
+                TempData["curUserType"] = "O";
+            }
             TempData.Keep();
             return View();
         }
         public IActionResult SwapUser()
         {
-            var IsOrganizer = _context.Organizatorius.FirstOrDefault(o => o.Id == (int)TempData["curUser"]);
-            if(IsOrganizer != null)
-                TempData["curUser"] = _context.Komanda.FirstOrDefault().Id;
+            if ((string)TempData["curUserType"] == "O")
+            {
+                TempData["curUserId"] = _context.Komanda.FirstOrDefault().Id;
+                TempData["curUserType"] = "K";
+            }
             else
-                TempData["curUser"] = _context.Organizatorius.FirstOrDefault().Id;
+            {
+                TempData["curUserId"] = _context.Organizatorius.FirstOrDefault().Id;
+                TempData["curUserType"] = "O";
+            }
             return RedirectToAction("Index");
         }
         public HomeController(TurnyruSistemaContext context)

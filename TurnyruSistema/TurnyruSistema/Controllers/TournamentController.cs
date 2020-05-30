@@ -171,6 +171,7 @@ namespace TurnyruSistema.Controllers
         public async Task <IActionResult> GenerateRound(int id)
         {
             var turnyras = await GetTournament(id);
+            turnyras.KompiuteriuZonos = _context.KompiuteriuZona.Where(kz => kz.TurnyrasId == id).ToList();
             var teamTournaments = await GetTeamTournament(id);
             var count = CountTeamsInTournament(teamTournaments);
             if(count >= MinimumTeams)
@@ -187,9 +188,10 @@ namespace TurnyruSistema.Controllers
         private TimetableVM GenerateTimetable(Turnyras turnyras, List<KomandaTurnyras> teamTournaments)
         {
             var teams = _context.Komanda.Where(k => teamTournaments.Any(tt => tt.KomandaId == k.Id)).ToList();
-            teams = teams.OrderBy(t => t.Laimejimai / t.Pralaimejimai).ToList();
+            teams = teams.OrderBy(t => t.Laimejimai / (t.Pralaimejimai +1)).ToList();
             var Reitingai = teams.Select(t => new { Reitingas = t.Laimejimai / t.Pralaimejimai, id = t.Id });
             var rounds = _context.Raundas.Where(r => r.TurnyrasId == turnyras.Id);
+            var TeamsSplit = new List<Tuple<int, int>>();
             if (rounds.Count() > 0)
             {
                 var winTeam = new List<Tuple <int, int>>();
@@ -203,7 +205,7 @@ namespace TurnyruSistema.Controllers
                     }
                 }
                 winTeam.OrderByDescending(wt => wt.Item1);
-                var TeamsSplit = new List<Tuple<int, int>>();
+                
                 while (winTeam.Count > 1)
                 {
                     var two = winTeam.Take(2).ToArray();
@@ -213,12 +215,26 @@ namespace TurnyruSistema.Controllers
                 }
 
             }
+            else
+            {
+                while (teams.Count > 1)
+                {
+                    var two = teams.Take(2).ToArray();
+                    TeamsSplit.Add(new Tuple<int, int>(two[0].Id, two[1].Id));
+                    teams.Remove(two[0]);
+                    teams.Remove(two[1]);
+                }
+            }
+            if (TeamsSplit.Count <= turnyras.KompiuteriuZonos.Sum(kz=>kz.KompiuteriuSkaicius))
+            {
+
+            }
             throw new NotImplementedException();
         }
 
         private int CountTeamsInTournament(List<KomandaTurnyras> komandaTurnyras)
         {
-            return komandaTurnyras.Count;
+            return komandaTurnyras.Where(kt=>kt.Dalyvauja).Count();
         }
 
         public async Task<List<KomandaTurnyras>> GetTeamTournament(int id)
