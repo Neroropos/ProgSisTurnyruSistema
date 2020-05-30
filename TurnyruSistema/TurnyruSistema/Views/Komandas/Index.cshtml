@@ -53,11 +53,7 @@
                 @Html.DisplayFor(modelItem => item.RegistracijosData)
             </td>
             <td>
-                @if (LoggedInId == item.Id)
-                {
                     <a asp-action="Details" asp-route-id="@item.Id">Redaguoti žaidėjus</a> 
-                }
-
             </td>
         </tr>
 }
