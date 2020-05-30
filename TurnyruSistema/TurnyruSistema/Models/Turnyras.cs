@@ -13,5 +13,7 @@ namespace TurnyruSistema.Models
         public DateTime PabaigosData { get; set; }
         public Organizatorius Organizatorius { get; set; }
         public int OrganizatoriusId { get; set; }
+        public List<KompiuteriuZona> KompiuteriuZonos { get; set; }
+        public List<KomandaTurnyras> Komandos { get; set; }
     }
 }

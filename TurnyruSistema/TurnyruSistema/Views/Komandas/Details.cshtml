@@ -1,0 +1,56 @@
+﻿@*@model List<TurnyruSistema.Models.Zaidejas>*@
+@model TurnyruSistema.Models.Komanda
+
+
+@{
+    ViewData["Title"] = "Komandos žaidėjai";
+}
+
+<h2>Komandos žaidėjai</h2>
+
+<p>
+    <a asp-action="AddPlayer" asp-route-id="@Model.Id">Pridėti žaidėją</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.zaidejai[0].vardas)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.zaidejai[0].slapyvardis)
+            </th>
+
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.zaidejai)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.vardas)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.slapyvardis)
+                </td>
+
+
+
+
+
+                <td>
+
+                    <a asp-action="UpdatePlayerInfo" asp-route-id="@item.Id">Redaguoti žaidėją</a> |
+                    <a asp-action="DeletePlayer" asp-route-id="@item.Id">Pašalinti žaidėją</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

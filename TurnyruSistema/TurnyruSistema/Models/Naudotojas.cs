@@ -11,5 +11,6 @@ namespace TurnyruSistema.Models
         public string Slaptazodis { get; set; }
         public string ElPastas { get; set; }
         public DateTime RegistracijosData { get; set; }
+        public List<Zinute> Zinutes { get; set; }
     }
 }

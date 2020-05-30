@@ -1,0 +1,41 @@
+﻿@model TurnyruSistema.Models.Zaidejas
+
+@{
+    ViewData["Title"] = "Redaguoti žaidėją";
+}
+
+<h2>Redaguoti žaidėją</h2>
+
+<h4>žaidėjas</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="UpdatePlayerInfo">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="vardas" class="control-label"></label>
+                <input asp-for="vardas" class="form-control" />
+                <span asp-validation-for="vardas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="slapyvardis" class="control-label"></label>
+                <input asp-for="slapyvardis" class="form-control" />
+                <span asp-validation-for="slapyvardis" class="text-danger"></span>
+            </div>
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="komandaId" />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

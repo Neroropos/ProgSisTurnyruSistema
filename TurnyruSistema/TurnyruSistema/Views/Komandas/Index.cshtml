@@ -1,0 +1,65 @@
+﻿@model IEnumerable<TurnyruSistema.Models.Komanda>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Komandų sąrašas</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Laimejimai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pralaimejimai)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.pavadinimas)
+            </th>
+            
+            
+            <th>
+                @Html.DisplayNameFor(model => model.ElPastas)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegistracijosData)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Laimejimai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Pralaimejimai)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.pavadinimas)
+            </td>
+            
+          
+            <td>
+                @Html.DisplayFor(modelItem => item.ElPastas)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegistracijosData)
+            </td>
+            <td>
+                @if (LoggedInId == item.Id)
+                {
+                    <a asp-action="Details" asp-route-id="@item.Id">Redaguoti žaidėjus</a> 
+                }
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

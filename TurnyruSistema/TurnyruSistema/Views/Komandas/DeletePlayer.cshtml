@@ -1,0 +1,35 @@
+﻿@model TurnyruSistema.Models.Zaidejas
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Pašalinti</h2>
+
+<h3>Ar tikrai pašalinti žaidėją iš komandos?</h3>
+<div>
+    <h4>Komanda</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.vardas)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.vardas)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.slapyvardis)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.slapyvardis)
+        </dd>
+        
+    </dl>
+    
+    <form asp-action="DeletePlayer">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="komandaId" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

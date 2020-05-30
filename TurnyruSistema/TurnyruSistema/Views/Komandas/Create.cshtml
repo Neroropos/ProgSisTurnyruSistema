@@ -1,0 +1,68 @@
+﻿@model TurnyruSistema.Models.Komanda
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Komanda</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Laimejimai" class="control-label"></label>
+                <input asp-for="Laimejimai" class="form-control" />
+                <span asp-validation-for="Laimejimai" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Pralaimejimai" class="control-label"></label>
+                <input asp-for="Pralaimejimai" class="form-control" />
+                <span asp-validation-for="Pralaimejimai" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Paveikslelis" class="control-label"></label>
+                <input asp-for="Paveikslelis" class="form-control" />
+                <span asp-validation-for="Paveikslelis" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="pavadinimas" class="control-label"></label>
+                <input asp-for="pavadinimas" class="form-control" />
+                <span asp-validation-for="pavadinimas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Prisijungimas" class="control-label"></label>
+                <input asp-for="Prisijungimas" class="form-control" />
+                <span asp-validation-for="Prisijungimas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Slaptazodis" class="control-label"></label>
+                <input asp-for="Slaptazodis" class="form-control" />
+                <span asp-validation-for="Slaptazodis" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ElPastas" class="control-label"></label>
+                <input asp-for="ElPastas" class="form-control" />
+                <span asp-validation-for="ElPastas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegistracijosData" class="control-label"></label>
+                <input asp-for="RegistracijosData" class="form-control" />
+                <span asp-validation-for="RegistracijosData" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
