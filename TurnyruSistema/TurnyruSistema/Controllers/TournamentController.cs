@@ -22,7 +22,6 @@ namespace TurnyruSistema.Controllers
         // GET: Turnyras
         public async Task<IActionResult> Index()
         {
-            var a = _context.Turnyras.ToList();
             var turnyruSistemaContext = _context.Turnyras;
             return View(await turnyruSistemaContext.ToListAsync());
         }
@@ -169,8 +168,6 @@ namespace TurnyruSistema.Controllers
             return _context.Turnyras.Any(e => e.Id == id);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task <IActionResult> GenerateRound(int id)
         {
             var turnyras = await GetTournament(id);
