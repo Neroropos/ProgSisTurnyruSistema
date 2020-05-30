@@ -9,11 +9,12 @@ using TurnyruSistema.Models;
 
 namespace TurnyruSistema.Controllers
 {
-    public class TurnyrasController : Controller
+    public class TournamentController : Controller
     {
         private readonly TurnyruSistemaContext _context;
+        private static int MinimumTeams = 2;
 
-        public TurnyrasController(TurnyruSistemaContext context)
+        public TournamentController(TurnyruSistemaContext context)
         {
             _context = context;
         }
@@ -21,7 +22,8 @@ namespace TurnyruSistema.Controllers
         // GET: Turnyras
         public async Task<IActionResult> Index()
         {
-            var turnyruSistemaContext = _context.Turnyras.Include(t => t.Organizatorius);
+            var a = _context.Turnyras.ToList();
+            var turnyruSistemaContext = _context.Turnyras;
             return View(await turnyruSistemaContext.ToListAsync());
         }
 
@@ -33,15 +35,20 @@ namespace TurnyruSistema.Controllers
                 return NotFound();
             }
 
-            var turnyras = await _context.Turnyras
-                .Include(t => t.Organizatorius)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var turnyras = await GetTournament(id);
             if (turnyras == null)
             {
                 return NotFound();
             }
 
             return View(turnyras);
+        }
+
+        public async Task<Turnyras> GetTournament(int? id)
+        {
+            return await _context.Turnyras
+                //.Include(t => t.Organizatorius)
+                .FirstOrDefaultAsync(m => m.Id == id);
         }
         public IActionResult FakeOrganizer()
         {
@@ -84,7 +91,7 @@ namespace TurnyruSistema.Controllers
                 return NotFound();
             }
 
-            var turnyras = await _context.Turnyras.FindAsync(id);
+            var turnyras = await GetTournament(id);
             if (turnyras == null)
             {
                 return NotFound();
@@ -137,9 +144,7 @@ namespace TurnyruSistema.Controllers
                 return NotFound();
             }
 
-            var turnyras = await _context.Turnyras
-                .Include(t => t.Organizatorius)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var turnyras = await GetTournament(id);
             if (turnyras == null)
             {
                 return NotFound();
@@ -153,7 +158,7 @@ namespace TurnyruSistema.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var turnyras = await _context.Turnyras.FindAsync(id);
+            var turnyras = await GetTournament(id);
             _context.Turnyras.Remove(turnyras);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -162,6 +167,67 @@ namespace TurnyruSistema.Controllers
         private bool TurnyrasExists(int id)
         {
             return _context.Turnyras.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task <IActionResult> GenerateRound(int id)
+        {
+            var turnyras = await GetTournament(id);
+            var teamTournaments = await GetTeamTournament(id);
+            var count = CountTeamsInTournament(teamTournaments);
+            if(count >= MinimumTeams)
+            {
+                var Timetable = GenerateTimetable(turnyras, teamTournaments);
+                return View("Timetable", Timetable);
+            }
+            else
+            {
+                throw new Exception("Not enough teams");
+            }
+        }
+
+        private TimetableVM GenerateTimetable(Turnyras turnyras, List<KomandaTurnyras> teamTournaments)
+        {
+            var teams = _context.Komanda.Where(k => teamTournaments.Any(tt => tt.KomandaId == k.Id)).ToList();
+            teams = teams.OrderBy(t => t.Laimejimai / t.Pralaimejimai).ToList();
+            var Reitingai = teams.Select(t => new { Reitingas = t.Laimejimai / t.Pralaimejimai, id = t.Id });
+            var rounds = _context.Raundas.Where(r => r.TurnyrasId == turnyras.Id);
+            if (rounds.Count() > 0)
+            {
+                var winTeam = new List<Tuple <int, int>>();
+                foreach (var team in teams)
+                {
+                    foreach(var round in rounds)
+                    {
+                        var Games = _context.Zaidimas.Where(z => z.RaundasId == round.Id && (z.Komanda1Id == team.Id || z.Komanda2Id == team.Id));
+                        var wins = Games.Where(g => g.LaimejusiKomanda == team.Id).Count();
+                        winTeam.Add(new Tuple<int, int>(wins, team.Id));
+                    }
+                }
+                winTeam.OrderByDescending(wt => wt.Item1);
+                var TeamsSplit = new List<Tuple<int, int>>();
+                while (winTeam.Count > 1)
+                {
+                    var two = winTeam.Take(2).ToArray();
+                    TeamsSplit.Add(new Tuple<int, int>(two[0].Item2, two[1].Item2));
+                    winTeam.Remove(two[0]);
+                    winTeam.Remove(two[1]);
+                }
+
+            }
+            throw new NotImplementedException();
+        }
+
+        private int CountTeamsInTournament(List<KomandaTurnyras> komandaTurnyras)
+        {
+            return komandaTurnyras.Count;
+        }
+
+        public async Task<List<KomandaTurnyras>> GetTeamTournament(int id)
+        {
+            return await _context.KomandaTurnyras
+                .Where(m => m.TurnyrasId == id).ToListAsync();
         }
     }
 }
