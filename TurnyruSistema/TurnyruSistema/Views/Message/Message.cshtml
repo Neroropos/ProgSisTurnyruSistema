@@ -1,0 +1,34 @@
+﻿@model TurnyruSistema.Models.Zinute
+
+
+@{
+    ViewData["Title"] = "Zinutė";
+}
+
+<h2>Žinutė</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Turinys)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => modelItem.Turinys)
+                </td>
+
+                <td>
+
+                    <a asp-action="Messages">Grįšti atgal</a>
+
+                </td>
+            </tr>
+
+    </tbody>
+</table>

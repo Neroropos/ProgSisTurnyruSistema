@@ -1,0 +1,38 @@
+﻿@model IEnumerable<TurnyruSistema.Models.Zinute>
+
+@{
+    ViewData["Title"] = "Messages";
+}
+
+<h2>Žinutės</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Tema)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IssiuntimoData)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Tema)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IssiuntimoData)
+                </td>
+                <td>
+                    <a asp-action="Message" asp-route-id="@item.Id">Peržiūrėti žinutę</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
