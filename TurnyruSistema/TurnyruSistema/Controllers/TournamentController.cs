@@ -267,6 +267,21 @@ namespace TurnyruSistema.Controllers
 
         }
 
+        public async Task<IActionResult> Warning(int? id, [Bind("Tema,Turinys,IssiuntimoData,NaudotojasId")] Zinute message)
+        {
+            message.NaudotojasId = (int)id;
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(message);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(TournamentTeams));
+            }
+
+            return View(message);
+
+        }
+
         public async Task<IActionResult> Register(int? id, [Bind("Dalyvauja,Ispejimai,KomandaId,TurnyrasId")] KomandaTurnyras registracija)
         {
             var turnyras = await _context.Turnyras
