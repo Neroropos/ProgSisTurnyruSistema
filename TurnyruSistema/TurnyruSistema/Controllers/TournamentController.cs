@@ -377,10 +377,10 @@ namespace TurnyruSistema.Controllers
                 .Where(m => m.TurnyrasId == id).ToListAsync();
         }
 
-        public async Task<IActionResult> TournamentTeams(int id)
+        public IActionResult TournamentTeams(int id)
         {
-            return View(await _context.KomandaTurnyras
-                .Where(m => m.TurnyrasId == id).ToListAsync());
+            var KomTur = _context.KomandaTurnyras.Include(x => x.Komanda).Where(m => m.TurnyrasId == id).ToList();
+            return View(KomTur);
         }
 
         public async Task<IActionResult> ConfirmTeam(int? id)
@@ -474,5 +474,25 @@ namespace TurnyruSistema.Controllers
             //computerZoneController = new ComputerZoneController(_context);
             return RedirectToAction("Details", "ComputerZone", new { id });
         }
+
+        public IActionResult RegisterResult(int komandos1Id, int komandos2Id, int raundoId, int turnyrId)
+        {
+            TeamController tc = new TeamController(_context);
+            tc.UpdateTeamWins(komandos1Id, komandos2Id);
+
+            var zaidimas = _context.Zaidimas.FirstOrDefault(x => x.RaundasId == raundoId && x.Komanda1Id == komandos1Id && x.Komanda2Id == komandos2Id);
+
+            if (zaidimas == null)
+            {
+                zaidimas = _context.Zaidimas.FirstOrDefault(x => x.RaundasId == raundoId && x.Komanda1Id == komandos2Id && x.Komanda2Id == komandos1Id);
+            }
+
+            zaidimas.Busena = Busena.Pasibaiges;
+
+            zaidimas.LaimejusiKomanda = komandos1Id;
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Details), new { id = turnyrId });
+        }
+
     }
 }

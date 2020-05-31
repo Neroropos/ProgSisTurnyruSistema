@@ -268,5 +268,16 @@ namespace TurnyruSistema.Controllers
         {
             return _context.Zaidejas.Any(e => e.Id == id);
         }
+
+        public void UpdateTeamWins(int winner, int loser)
+        {
+            var komandaWinner = _context.Komanda.First(x => x.Id == winner);
+            var komandaLoser = _context.Komanda.First(x => x.Id == loser);
+
+            komandaWinner.Laimejimai++;
+            komandaLoser.Pralaimejimai++;
+
+            _context.SaveChanges();
+        }
     }
 }

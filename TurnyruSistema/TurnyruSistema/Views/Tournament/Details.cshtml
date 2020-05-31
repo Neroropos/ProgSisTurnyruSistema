@@ -62,12 +62,16 @@
                             </dt>
                             <dd>
                                 @Html.DisplayFor(model => zaidimas.Komanda1.pavadinimas)
+                                <a asp-action="RegisterResult" asp-route-turnyrId="@Model.Id" asp-route-komandos1Id="@zaidimas.Komanda1Id" asp-route-komandos2Id="@zaidimas.Komanda2Id" asp-route-raundoId="@zaidimas.RaundasId">Laimėjo</a>
+
                             </dd>
                             <dt>
                                 @Html.DisplayNameFor(model => zaidimas.Komanda2)
                             </dt>
                             <dd>
                                 @Html.DisplayFor(model => zaidimas.Komanda2.pavadinimas)
+                                <a asp-action="RegisterResult" asp-route-turnyrId="@Model.Id" asp-route-komandos1Id="@zaidimas.Komanda2Id" asp-route-komandos2Id="@zaidimas.Komanda1Id" asp-route-raundoId="@zaidimas.RaundasId">Laimėjo</a>
+
                             </dd>
                             <dt>
                                 @Html.DisplayNameFor(model => zaidimas.Laikas)
