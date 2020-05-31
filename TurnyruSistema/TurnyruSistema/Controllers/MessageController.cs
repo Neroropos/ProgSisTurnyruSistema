@@ -52,13 +52,42 @@ namespace TurnyruSistema.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Tema,Turinys,IssiuntimoData,NaudotojasId")] Zinute message)
+        public async Task<IActionResult> Create([Bind("Tema,Turinys,IssiuntimoData,NaudotojasId")] Zinute message, int? id)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(message);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Messages));
+            }
+            return View(message);
+        }
+
+        
+        public async Task<IActionResult> CreateMessage([Bind("Tema,Turinys,IssiuntimoData,NaudotojasId")] Zinute message)
+        {
+            if (ModelState.IsValid)
+            {
+                message.Tema = "Registracija";
+                message.Turinys = "Nauja komanda pateikė prašymą";
+                message.NaudotojasId = 2;
+                _context.Add(message);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index","Tournament");
+            }
+            return View(message);
+        }
+
+        public async Task<IActionResult> SendMessageWarning([Bind("Tema,Turinys,IssiuntimoData,NaudotojasId")] Zinute message)
+        {
+            if (ModelState.IsValid)
+            {
+                message.Tema = "Ispejimas";
+                message.Turinys = "Jūsų komanda gavo įspėjimą";
+                message.NaudotojasId = 1;
+                _context.Add(message);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Tournament");
             }
             return View(message);
         }

@@ -9,7 +9,11 @@
 <h2>Komandos žaidėjai</h2>
 
 <p>
-    <a asp-action="AddPlayer" asp-route-id="@Model.Id">Pridėti žaidėją</a>
+    @if ((string)TempData["curUserType"] == "K")
+    {
+        TempData.Keep();
+        <a asp-action="AddPlayer" asp-route-id="@Model.Id">Pridėti žaidėją</a>
+    }
 </p>
 
 <table class="table">
@@ -43,14 +47,28 @@
 
 
                 <td>
-
-                    <a asp-action="UpdatePlayerInfo" asp-route-id="@item.Id">Redaguoti žaidėją</a> |
-                    <a asp-action="DeletePlayer" asp-route-id="@item.Id">Pašalinti žaidėją</a>
+                    @if ((string)TempData["curUserType"] == "K")
+                    {
+                        TempData.Keep();
+                        <a asp-action="UpdatePlayerInfo" asp-route-id="@item.Id">Redaguoti žaidėją |</a>
+                        <a asp-action="DeletePlayer" asp-route-id="@item.Id">Pašalinti žaidėją</a>
+                    }
 
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@if (TempData["Message"] != null)
+{
+    <script type="text/javascript">
+            window.onload = function () {
+                alert("@TempData["Message"]");
+
+            };
+    </script>
+    TempData.Remove("Message");
+}
 
 

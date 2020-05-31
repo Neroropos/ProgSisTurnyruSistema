@@ -11,13 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Views\Komandas\AddPlayer.cshtml">
+    <Content Update="Views\Team\AddPlayer.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\Komandas\DeletePlayer.cshtml">
+    <Content Update="Views\Team\DeletePlayer.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\Komandas\UpdatePlayerInfo.cshtml">
+    <Content Update="Views\Team\UpdatePlayerInfo.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
   </ItemGroup>

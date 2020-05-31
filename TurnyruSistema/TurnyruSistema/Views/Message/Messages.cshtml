@@ -4,35 +4,83 @@
     ViewData["Title"] = "Messages";
 }
 
-<h2>Žinutės</h2>
+@if ((string)TempData["curUserType"] == "O")
+{
+    TempData.Keep();
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Tema)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IssiuntimoData)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <h2>Žinutės</h2>
+
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Tema)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IssiuntimoData)
-                </td>
-                <td>
-                    <a asp-action="Message" asp-route-id="@item.Id">Peržiūrėti žinutę</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tema)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IssiuntimoData)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (item.NaudotojasId == 2)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Tema)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IssiuntimoData)
+                        </td>
+                        <td>
+                            <a asp-action="Message" asp-route-id="@item.Id">Peržiūrėti žinutę</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+@if ((string)TempData["curUserType"] == "K")
+{
+    TempData.Keep();
+
+    <h2>Žinutės</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tema)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IssiuntimoData)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (item.NaudotojasId == 1)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Tema)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IssiuntimoData)
+                        </td>
+                        <td>
+                            <a asp-action="Message" asp-route-id="@item.Id">Peržiūrėti žinutę</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
 

@@ -7,7 +7,7 @@
 <h2>Kompiuterių zonų sąrašas</h2>
 
 <p>
-    <a asp-action="AddComputerZone" asp-route-id="@Model.Id">Pridėti kompiuterių zoną</a>
+    <a asp-action="Create" asp-route-id="@Model.Id">Pridėti kompiuterių zoną</a>
 </p>
 
 
@@ -43,8 +43,8 @@
 
                 <td>
 
-                    <a asp-action="Edit" asp-route-id="@item.Id">Redaguoti kompiuterių zoną</a> 
-                    
+                    <a asp-action="Edit" asp-route-id="@item.Id">Redaguoti kompiuterių zoną</a>
+
 
                 </td>
             </tr>
@@ -52,31 +52,42 @@
     </tbody>
 </table>
 
+@if (TempData["Message"] != null)
+{
+    <script type="text/javascript">
+            window.onload = function () {
+                alert("@TempData["Message"]");
+
+            };
+    </script>
+    TempData.Remove("Message");
+}
+
 @*<div>
-    <h4>KompiuteriuZona</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Pavadinimas)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Pavadinimas)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.KompiuteriuSkaicius)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.KompiuteriuSkaicius)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Turnyras)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Turnyras.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>*@
+        <h4>KompiuteriuZona</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Pavadinimas)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Pavadinimas)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.KompiuteriuSkaicius)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.KompiuteriuSkaicius)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Turnyras)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Turnyras.Id)
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+        <a asp-action="Index">Back to List</a>
+    </div>*@

@@ -54,10 +54,21 @@
                     @Html.DisplayFor(modelItem => item.RegistracijosData)
                 </td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Redaguoti žaidėjus</a>
+                    <a asp-action="Details" asp-route-id="@item.Id">Peržiūrėti žaidėjus</a>
 
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@if (TempData["Message"] != null)
+{
+    <script type="text/javascript">
+            window.onload = function () {
+                alert("@TempData["Message"]");
+
+            };
+    </script>
+    TempData.Remove("Message");
+}

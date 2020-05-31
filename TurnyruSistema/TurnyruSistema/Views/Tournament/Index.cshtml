@@ -4,12 +4,13 @@
     ViewData["Title"] = "TournamentList";
 }
 
-<h2>Index</h2>
+<h2>Turnyrų sąrašas</h2>
 
-@if ((string)TempData["curUserType"] == "O") {
+@if ((string)TempData["curUserType"] == "O")
+{
     TempData.Keep();
     <p>
-        <a asp-action="Create">Create New</a>
+        <a asp-action="Create">Sukurti naują</a>
     </p>
 }
 <table class="table">
@@ -34,39 +35,51 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Pavadinimas)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Vieta)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PradziosData)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PabaigosData)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrganizatoriusId)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id"> Details </a>
-                @if ((string)TempData["curUserType"] == "O")
-                {
-                    TempData.Keep();
-                    <a asp-action="Edit" asp-route-id="@item.Id"> Edit </a>
-                    <a asp-action="Delete" asp-route-id="@item.Id"> Delete </a>
-                    <a asp-action="TournamentTeams" asp-route-id="@item.Id"> TeamsThatWantToParticipate </a>
-                }
-                @if ((string)TempData["curUserType"] == "K")
-                {
-                    TempData.Keep();
-                    <a asp-action="Register" asp-route-id="@item.Id"> Register </a>
-                }
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pavadinimas)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Vieta)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PradziosData)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PabaigosData)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrganizatoriusId)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id"> Turnyro informacija </a> |
+                    @if ((string)TempData["curUserType"] == "O")
+                    {
+                        TempData.Keep();
+                        <a asp-action="Edit" asp-route-id="@item.Id"> Redaguoti turnyrą | </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id"> panaikinti turnyrą | </a>
+                        <a asp-action="TournamentTeams" asp-route-id="@item.Id"> Peržiūrėti komandas </a>
+                    }
+                    @if ((string)TempData["curUserType"] == "K")
+                    {
+                        TempData.Keep();
+                        <a asp-action="Register" asp-route-id="@item.Id"> Užsiregistruoti </a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@if (TempData["Message"] != null)
+{
+    <script type="text/javascript">
+            window.onload = function () {
+                alert("@TempData["Message"]");
+                
+            };
+    </script>
+    TempData.Remove("Message");
+}

@@ -90,12 +90,16 @@ namespace TurnyruSistema.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(turnyras);
+                CreateNewTournament(turnyras);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["OrganizatoriusId"] = new SelectList(_context.Set<Organizatorius>(), "Id", "Id", turnyras.OrganizatoriusId);
             return View(turnyras);
+        }
+        public void CreateNewTournament(Turnyras temp)
+        {
+            _context.Add(temp);
         }
 
         // GET: Turnyras/Edit/5
@@ -145,6 +149,7 @@ namespace TurnyruSistema.Controllers
                         throw;
                     }
                 }
+                TempData["Message"] = "Turnyro duomenys sekmingai pakeisti";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["OrganizatoriusId"] = new SelectList(_context.Set<Organizatorius>(), "Id", "Id", turnyras.OrganizatoriusId);
@@ -174,8 +179,16 @@ namespace TurnyruSistema.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var turnyras = await GetTournament(id);
+            //_context.Turnyras.Remove(turnyras);
+            
+            var turnyrasKomanda = await _context.KomandaTurnyras
+                .Where<KomandaTurnyras>(m => m.TurnyrasId == id).ToListAsync<KomandaTurnyras>();
+            foreach(var item in turnyrasKomanda)
+            _context.KomandaTurnyras.Remove(item);
             _context.Turnyras.Remove(turnyras);
+
             await _context.SaveChangesAsync();
+            TempData["Message"] = "Turnyras pasalintas";
             return RedirectToAction(nameof(Index));
         }
 
@@ -193,6 +206,7 @@ namespace TurnyruSistema.Controllers
             if (count >= MinimumTeams)
             {
                 var Timetable = GenerateTimetable(turnyras, teamTournaments);
+                TempData["Message"] = "Raundas sekmingai sukurtas";
                 return RedirectToAction("Details", new { id });
             }
             else
@@ -381,25 +395,53 @@ namespace TurnyruSistema.Controllers
             {
                 _context.Update(patvirtinimas);
                 await _context.SaveChangesAsync();
+                TempData["Message"] = "Komandos registracija patvirtinta";
             }
 
             return RedirectToAction(nameof(Index)); ;
 
         }
 
-        public async Task<IActionResult> Warning(int? id, [Bind("Tema,Turinys,IssiuntimoData,NaudotojasId")] Zinute message)
+        public async Task<IActionResult> WarnTeam(int id)
         {
-            message.NaudotojasId = (int)id;
+            var ispejimas = await _context.KomandaTurnyras
+                //.Include(t => t.Organizatorius)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (ModelState.IsValid)
+            var turnyras = new Turnyras { Id = id };
+
+            if (ispejimas.Ispejimai >= 3)
             {
-                _context.Add(message);
+                RemoveTeamFromTournament(ispejimas);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(TournamentTeams));
+                // ViewBag.Message = "Success";
+                TempData["Message"] = "Komanda pasalinta";
+                //return RedirectToAction(nameof(Index));
             }
+            else
+            {
+                //ispejimas.Ispejimai++;
+                IncreaseWarning(ispejimas);
+                if (ModelState.IsValid)
+                {
+                    _context.Update(ispejimas);
+                    await _context.SaveChangesAsync();
+                    TempData["Message"] = "Komandai duotas ispejimas";
 
-            return View(message);
+                }
+            }
+   
+            return RedirectToAction("SendMessageWarning", "Message");
 
+        }
+        private void RemoveTeamFromTournament(KomandaTurnyras temp)
+        {
+            _context.KomandaTurnyras.Remove(temp);
+        }
+
+        private void IncreaseWarning(KomandaTurnyras temp)
+        {
+            temp.Ispejimai++;
         }
 
         public async Task<IActionResult> Register(int? id, [Bind("Dalyvauja,Ispejimai,KomandaId,TurnyrasId")] KomandaTurnyras registracija)
@@ -418,13 +460,16 @@ namespace TurnyruSistema.Controllers
             {
                 _context.Add(registracija);
                 await _context.SaveChangesAsync();
+                TempData["Message"] = "Registracija sekminga";
             }
 
-            return RedirectToAction(nameof(Index)); ;
+
+            return RedirectToAction("CreateMessage", "Message");
+            //return RedirectToAction(nameof(Index)); 
 
         }
 
-        public async Task<IActionResult> EditTournament(int? id)
+        public IActionResult EditTournament(int? id)
         {
             //computerZoneController = new ComputerZoneController(_context);
             return RedirectToAction("Details", "ComputerZone", new { id });

@@ -9,11 +9,11 @@ using TurnyruSistema.Models;
 
 namespace TurnyruSistema.Controllers
 {
-    public class KomandasController : Controller
+    public class TeamController : Controller
     {
         private readonly TurnyruSistemaContext _context;
 
-        public KomandasController(TurnyruSistemaContext context)
+        public TeamController(TurnyruSistemaContext context)
         {
             _context = context;
         }
@@ -88,6 +88,7 @@ namespace TurnyruSistema.Controllers
                 _context.Add(zaidejas);
                 //komanda.zaidejai.Add(zaidejas);
                 await _context.SaveChangesAsync();
+                TempData["Message"] = "Zaidejas sekmingai pridetas prie komandos";
             }
             return RedirectToAction("Details", new { id });
         }
@@ -175,8 +176,9 @@ namespace TurnyruSistema.Controllers
             {
                 try
                 {
-                    _context.Update(zaidejas);
+                    SendModifiedData(zaidejas);
                     await _context.SaveChangesAsync();
+                    TempData["Message"] = "zaidejo duomenys sekmingai atnaujinti";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -189,9 +191,15 @@ namespace TurnyruSistema.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+            //TempData["Message"] = "zaidejo duomenys sekmingai atnaujinti";
             return View(zaidejas);
+        }
+        public void SendModifiedData(Zaidejas temp)
+        {
+            _context.Update(temp);
         }
 
 
@@ -208,7 +216,7 @@ namespace TurnyruSistema.Controllers
             {
                 return NotFound();
             }
-
+            TempData["Message"] = "Zaidejas panaikintas";
             return View(zaidejas);
         }
 

@@ -26,7 +26,7 @@ namespace TurnyruSistema.Controllers
         }
 
         // GET: ComputerZone/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == null)
             {
@@ -50,7 +50,7 @@ namespace TurnyruSistema.Controllers
         }
 
         // GET: ComputerZone/Create
-        public IActionResult Create()
+        public IActionResult Create2()
         {
             ViewData["TurnyrasId"] = new SelectList(_context.Turnyras, "Id", "Id");
             return View();
@@ -61,7 +61,7 @@ namespace TurnyruSistema.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Pavadinimas,KompiuteriuSkaicius,TurnyrasId,Id")] KompiuteriuZona kompiuteriuZona)
+        public async Task<IActionResult> Create2([Bind("Pavadinimas,KompiuteriuSkaicius,TurnyrasId,Id")] KompiuteriuZona kompiuteriuZona)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +73,7 @@ namespace TurnyruSistema.Controllers
             return View(kompiuteriuZona);
         }
 
-        public IActionResult AddComputerZone(int id)
+        public IActionResult Create(int id)
         {
 
             var kompiuteriuZona = new KompiuteriuZona { TurnyrasId = id };
@@ -84,7 +84,7 @@ namespace TurnyruSistema.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComputerZone([Bind("Pavadinimas,KompiuteriuSkaicius,TurnyrasId")] KompiuteriuZona kompiuteriuZona, int id)
+        public async Task<IActionResult> Create([Bind("Pavadinimas,KompiuteriuSkaicius,TurnyrasId")] KompiuteriuZona kompiuteriuZona, int id)
         {
             var turnyras = await _context.Turnyras
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -93,15 +93,21 @@ namespace TurnyruSistema.Controllers
             if (ModelState.IsValid)
             {
                 kompiuteriuZona.TurnyrasId = id;
-                _context.Add(kompiuteriuZona);
+                CreateNewZone(kompiuteriuZona);
                 //komanda.zaidejai.Add(zaidejas);
                 await _context.SaveChangesAsync();
+                TempData["Message"] = "Kompiuteriu zona sekmingai sukurta";
                 return RedirectToAction(nameof(Details),new { id});
             }
             return View(kompiuteriuZona);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        public void CreateNewZone(KompiuteriuZona temp)
+        {
+            _context.Add(temp);
+        }
+
+        public async Task<IActionResult> Edit(int id)
         {
             if (id == null)
             {
@@ -135,6 +141,8 @@ namespace TurnyruSistema.Controllers
                 {
                     _context.Update(kompiuteriuZona);
                     await _context.SaveChangesAsync();
+                    TempData["Message"] = "Kompiuteriu zona sekmingai pakeista";
+                    //return RedirectToAction(nameof(Details), new { id });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -147,7 +155,8 @@ namespace TurnyruSistema.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Details), new { id });
+                return RedirectToAction(nameof(Details), new { id = kompiuteriuZona.TurnyrasId });
+                // return RedirectToAction(nameof(Details));
             }
             return View(kompiuteriuZona);
         }
@@ -239,6 +248,7 @@ namespace TurnyruSistema.Controllers
             var kompiuteriuZona = await _context.KompiuteriuZona.FindAsync(id);
             _context.KompiuteriuZona.Remove(kompiuteriuZona);
             await _context.SaveChangesAsync();
+            TempData["Message"] = "Kompiuteriu zona sekmingai panaikinta";
             return RedirectToAction(nameof(Index));
         }
 
