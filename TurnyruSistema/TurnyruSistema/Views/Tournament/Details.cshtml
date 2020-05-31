@@ -1,11 +1,8 @@
 ﻿@model TurnyruSistema.Models.Turnyras
-
 @{
     ViewData["Title"] = "Details";
 }
-
 <h2>Details</h2>
-
 <div>
     <h4>Turnyras</h4>
     <hr />
@@ -41,6 +38,55 @@
             @Html.DisplayFor(model => model.Organizatorius.Id)
         </dd>
     </dl>
+
+</div>
+<div>
+    <h4>Raundai</h4>
+    <hr />
+    @foreach (var raundas in Model.Raundai)
+    {
+        <div>
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => raundas.Numeris)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => raundas.Numeris)
+                </dd>
+                @foreach (var zaidimas in raundas.Zaidimai)
+                {
+                    <div>
+                        <dl>
+                            <dt>
+                                @Html.DisplayNameFor(model => zaidimas.Komanda1)
+                            </dt>
+                            <dd>
+                                @Html.DisplayFor(model => zaidimas.Komanda1.pavadinimas)
+                            </dd>
+                            <dt>
+                                @Html.DisplayNameFor(model => zaidimas.Komanda2)
+                            </dt>
+                            <dd>
+                                @Html.DisplayFor(model => zaidimas.Komanda2.pavadinimas)
+                            </dd>
+                            <dt>
+                                @Html.DisplayNameFor(model => zaidimas.Laikas)
+                            </dt>
+                            <dd>
+                                @Html.DisplayFor(model => zaidimas.Laikas)
+                            </dd>
+                            <dt>
+                                @Html.DisplayNameFor(model => zaidimas.LaimejusiKomanda)
+                            </dt>
+                            <dd>
+                                @Html.DisplayFor(model => zaidimas.LaimejusiKomanda)
+                            </dd>
+                        </dl>
+                    </div>
+                }
+            </dl>
+        </div>
+    }
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>

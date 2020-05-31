@@ -35,10 +35,20 @@ namespace TurnyruSistema.Controllers
             }
 
             var turnyras = await GetTournament(id);
+
             if (turnyras == null)
             {
                 return NotFound();
             }
+            turnyras.Raundai = _context.Raundas
+            .Include(r => r.Zaidimai)
+            .Where(r => r.TurnyrasId == id).ToList();
+            foreach (var raundas in turnyras.Raundai)
+                foreach (var zaid in raundas.Zaidimai)
+                {
+                    zaid.Komanda1 = _context.Komanda.First(z => z.Id == zaid.Komanda1Id);
+                    zaid.Komanda2 = _context.Komanda.First(z => z.Id == zaid.Komanda2Id);
+                }
 
             return View(turnyras);
         }
@@ -51,8 +61,14 @@ namespace TurnyruSistema.Controllers
         }
         public IActionResult FakeOrganizer()
         {
-            var organizer = new Organizatorius { ElPastas = "test", Prisijungimas = "test", Slaptazodis = "test" ,
-            RegistracijosData = DateTime.Now, RodomasVardas = "Test"};
+            var organizer = new Organizatorius
+            {
+                ElPastas = "test",
+                Prisijungimas = "test",
+                Slaptazodis = "test",
+                RegistracijosData = DateTime.Now,
+                RodomasVardas = "Test"
+            };
             _context.Add(organizer);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
@@ -168,16 +184,16 @@ namespace TurnyruSistema.Controllers
             return _context.Turnyras.Any(e => e.Id == id);
         }
 
-        public async Task <IActionResult> GenerateRound(int id)
+        public async Task<IActionResult> GenerateRound(int id)
         {
             var turnyras = await GetTournament(id);
             turnyras.KompiuteriuZonos = _context.KompiuteriuZona.Where(kz => kz.TurnyrasId == id).ToList();
             var teamTournaments = await GetTeamTournament(id);
             var count = CountTeamsInTournament(teamTournaments);
-            if(count >= MinimumTeams)
+            if (count >= MinimumTeams)
             {
                 var Timetable = GenerateTimetable(turnyras, teamTournaments);
-                return View("Timetable", Timetable);
+                return RedirectToAction("Details", new { id });
             }
             else
             {
@@ -185,34 +201,22 @@ namespace TurnyruSistema.Controllers
             }
         }
 
-        private TimetableVM GenerateTimetable(Turnyras turnyras, List<KomandaTurnyras> teamTournaments)
+        private Raundas GenerateTimetable(Turnyras turnyras, List<KomandaTurnyras> teamTournaments)
         {
             var teams = _context.Komanda.Where(k => teamTournaments.Any(tt => tt.KomandaId == k.Id)).ToList();
-            teams = teams.OrderBy(t => t.Laimejimai / (t.Pralaimejimai +1)).ToList();
-            var Reitingai = teams.Select(t => new { Reitingas = t.Laimejimai / t.Pralaimejimai, id = t.Id });
+            teams = teams.OrderBy(t => t.Laimejimai / (t.Pralaimejimai + 1)).ToList();
+            var Reitingai = teams.Select(t => new { Reitingas = t.Laimejimai / (t.Pralaimejimai+1), id = t.Id });
             var rounds = _context.Raundas.Where(r => r.TurnyrasId == turnyras.Id);
+            int CurrentRoundNr = rounds.Count() > 0 ? rounds.Max(r => r.Numeris) + 1 : 1;
+            Raundas Raundas = CreateRound(turnyras.Id, CurrentRoundNr);
+            Raundas.Zaidimai = new List<Zaidimas>();
             var TeamsSplit = new List<Tuple<int, int>>();
             if (rounds.Count() > 0)
             {
-                var winTeam = new List<Tuple <int, int>>();
-                foreach (var team in teams)
-                {
-                    foreach(var round in rounds)
-                    {
-                        var Games = _context.Zaidimas.Where(z => z.RaundasId == round.Id && (z.Komanda1Id == team.Id || z.Komanda2Id == team.Id));
-                        var wins = Games.Where(g => g.LaimejusiKomanda == team.Id).Count();
-                        winTeam.Add(new Tuple<int, int>(wins, team.Id));
-                    }
-                }
+                var winTeam = new List<Tuple<int, int>>();
+                CalculateWins(teams, rounds, winTeam);
                 winTeam.OrderByDescending(wt => wt.Item1);
-                
-                while (winTeam.Count > 1)
-                {
-                    var two = winTeam.Take(2).ToArray();
-                    TeamsSplit.Add(new Tuple<int, int>(two[0].Item2, two[1].Item2));
-                    winTeam.Remove(two[0]);
-                    winTeam.Remove(two[1]);
-                }
+                PairTeams(TeamsSplit, winTeam);
 
             }
             else
@@ -225,16 +229,132 @@ namespace TurnyruSistema.Controllers
                     teams.Remove(two[1]);
                 }
             }
-            if (TeamsSplit.Count <= turnyras.KompiuteriuZonos.Sum(kz=>kz.KompiuteriuSkaicius))
+            if (TeamsSplit.Count*10 <= turnyras.KompiuteriuZonos.Sum(kz => kz.KompiuteriuSkaicius))
             {
-
+                GenerateForNormal(turnyras, CurrentRoundNr, Raundas, TeamsSplit);
             }
-            throw new NotImplementedException();
+            else
+            {
+                var compCount = turnyras.KompiuteriuZonos.Sum(kz => kz.KompiuteriuSkaicius);
+                var TimeBlocks = Math.Ceiling(TeamsSplit.Count / (Math.Floor((double)compCount / 10)));
+                var TimePerGame = Convert.ToInt32(Math.Floor(50 / (TimeBlocks)));
+                CalculateWaitingTimes(TeamsSplit, TimePerGame);
+
+                var RatedTeams = TeamsSplit.OrderBy(ts => Reitingai.First(r => ts.Item1 == r.id).Reitingas + Reitingai.First(r => ts.Item2 == r.id).Reitingas).ToList();
+                //Generate games
+                GenerateForAbnormal(turnyras, CurrentRoundNr, Raundas, RatedTeams, TimePerGame);
+            }
+            return Raundas;
         }
 
+        private static void CalculateWaitingTimes(List<Tuple<int, int>> TeamsSplit, int TimePerGame)
+        {
+            var waitingTime = TeamsSplit.Select(ts => new Tuple<Tuple<int, int>, int>(ts, TimePerGame));
+
+            var oWait = waitingTime.OrderBy(o => o.Item2);
+        }
+
+        private void GenerateForAbnormal(Turnyras turnyras, int CurrentRoundNr, Raundas Raundas, List<Tuple<int, int>> TeamsSplit, int TimePerGame)
+        {
+            var Zonos = new List<KompiuteriuZona>(turnyras.KompiuteriuZonos);
+            var curZone = Zonos.First(z => z.KompiuteriuSkaicius >= 10);
+            var remCount = curZone.KompiuteriuSkaicius;
+            var incValue = 0;
+            Zonos.Remove(curZone);
+            foreach (var TeamPair in TeamsSplit)
+            {
+                if (remCount < 10)
+                {
+                    if (Zonos.Count > 0)
+                    {
+                        curZone = Zonos.First(z => z.KompiuteriuSkaicius >= 10);
+                        Zonos.Remove(curZone);
+                        remCount = curZone.KompiuteriuSkaicius;
+                        
+                    }
+                    else
+                    {
+                        Zonos = new List<KompiuteriuZona>(turnyras.KompiuteriuZonos);
+                        curZone = Zonos.First(z => z.KompiuteriuSkaicius >= 10);
+                        remCount = curZone.KompiuteriuSkaicius;
+                        incValue++;
+                    }
+                }
+                DateTime gameStartTime = turnyras.PradziosData;
+                gameStartTime = gameStartTime.AddMinutes(TimePerGame * (CurrentRoundNr - 1 + incValue));
+                var game = CreateGame(TeamPair.Item1, TeamPair.Item2, curZone.Id, Raundas.Id, gameStartTime);
+                Raundas.Zaidimai.Add(game);
+                remCount -= 10;
+
+            }
+        }
+
+        private void GenerateForNormal(Turnyras turnyras, int CurrentRoundNr, Raundas Raundas, List<Tuple<int, int>> TeamsSplit)
+        {
+            var Zonos = new List<KompiuteriuZona>(turnyras.KompiuteriuZonos);
+            var curZone = Zonos.First(z => z.KompiuteriuSkaicius >= 10);
+            var remCount = curZone.KompiuteriuSkaicius;
+            Zonos.Remove(curZone);
+            foreach (var TeamPair in TeamsSplit)
+            {
+                if (remCount < 10)
+                {
+                    curZone = Zonos.First(z => z.KompiuteriuSkaicius >= 10);
+                    Zonos.Remove(curZone);
+                    remCount = curZone.KompiuteriuSkaicius;
+                }
+                DateTime gameStartTime = turnyras.PradziosData;
+                gameStartTime = gameStartTime.AddMinutes(50 * (CurrentRoundNr - 1));
+                var game = CreateGame(TeamPair.Item1, TeamPair.Item2, curZone.Id, Raundas.Id, gameStartTime);
+                Raundas.Zaidimai.Add(game);
+                remCount -= 10;
+
+            }
+        }
+
+        private static void PairTeams(List<Tuple<int, int>> TeamsSplit, List<Tuple<int, int>> winTeam)
+        {
+            while (winTeam.Count > 1)
+            {
+                var two = winTeam.Take(2).ToArray();
+                TeamsSplit.Add(new Tuple<int, int>(two[0].Item2, two[1].Item2));
+                winTeam.Remove(two[0]);
+                winTeam.Remove(two[1]);
+            }
+        }
+
+        private void CalculateWins(List<Komanda> teams, IQueryable<Raundas> rounds, List<Tuple<int, int>> winTeam)
+        {
+            foreach (var team in teams)
+            {
+                var wins = 0;
+                foreach (var round in rounds)
+                {
+                    var Games = _context.Zaidimas.Where(z => z.RaundasId == round.Id && (z.Komanda1Id == team.Id || z.Komanda2Id == team.Id));
+                    wins += Games.Where(g => g.LaimejusiKomanda == team.Id).Count();
+
+                }
+                winTeam.Add(new Tuple<int, int>(wins, team.Id));
+            }
+        }
+
+        Zaidimas CreateGame(int Team1, int Team2, int Zone, int Round, DateTime time)
+        {
+            var game = new Zaidimas { Komanda1Id = Team1, Komanda2Id = Team2, KompiuteriuZonaId = Zone, RaundasId = Round, Laikas = time, Busena = Busena.Laukiama };
+            _context.Zaidimas.Add(game);
+            _context.SaveChanges();
+            return game;
+        }
+        Raundas CreateRound(int Tournament, int Nr)
+        {
+            var Raundas = new Raundas { TurnyrasId = Tournament, Numeris = Nr };
+            _context.Raundas.Add(Raundas);
+            _context.SaveChanges();
+            return Raundas;
+        }
         private int CountTeamsInTournament(List<KomandaTurnyras> komandaTurnyras)
         {
-            return komandaTurnyras.Where(kt=>kt.Dalyvauja).Count();
+            return komandaTurnyras.Where(kt => kt.Dalyvauja).Count();
         }
 
         public async Task<List<KomandaTurnyras>> GetTeamTournament(int id)
